@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 
-from flask import Flask, url_for, render_template,session, make_response
+from flask import Flask, url_for, render_template, session, make_response
 from flask import jsonify, request, redirect
 from flaskext.markdown import Markdown
 from datetime import datetime
 from sqlalchemy import desc
 import json
-import random, string
+import random
+import string
 from database import db_session, User, Category, CategoryItem
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
@@ -21,36 +22,42 @@ Markdown(app)
 app_id = '1014045698744557'
 client_json = None
 
-
+# read google client secret for later use
 with open('client_secret.json') as file:
     client_json = json.loads(file.read())
 
-@app.route('/', methods = ['GET'])
-@app.route('/index', methods = ['GET'])
+
+# home page route
+@app.route('/', methods=['GET'])
+@app.route('/index', methods=['GET'])
 def home():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
-     for x in range(32))
+                    for x in range(32))
     session['state'] = state
-    if session.get('id',0) != 0:
+    if session.get('id', 0) != 0:
         login = session
     else:
-         login = False
+        login = False
     categories = db_session.query(Category).all()
     items = db_session.query(CategoryItem).\
-    order_by(desc(CategoryItem.latest_update)).limit(10).all()
+        order_by(desc(CategoryItem.latest_update)).limit(10).all()
     return render_template('index.html',
-state = state,client = client_json['web']['client_id'],
-appid = app_id,login = login,categories = categories,
-items = items, title = "Item Catalog::Home")
+                           state=state, client=client_json['web']['client_id'],
+                           appid=app_id, login=login, categories=categories,
+                           items=items, title="Item Catalog::Home")
 
+
+# google api disconnect
 @app.route('/api/v1/gdisconnect')
 def gdisconnect():
     access_token = session.get('access_token')
     if access_token is None:
-        response = make_response(json.dumps('Current user not connected.'), 401)
+        response = make_response(json.dumps('Current user not connected.'),
+                                 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % session['access_token']
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s'\
+        % session['access_token']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
     if result['status'] == '200':
@@ -63,12 +70,14 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     else:
-        response = make_response(json.dumps('Failed to revoke token for given user.', 400))
+        response = make_response(
+            json.dumps('Failed to revoke token for given user.', 400))
         response.headers['Content-Type'] = 'application/json'
     return response
 
 
-@app.route('/api/v1/fconnect', methods = ['POST'])
+# facebook api connected
+@app.route('/api/v1/fconnect', methods=['POST'])
 def fb():
     if request.args.get('state') != session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
@@ -80,29 +89,37 @@ def fb():
     session['email'] = auth['email']
     session['provider'] = 'fb'
 
-    user_list = db_session.query(User).filter(User.email == session['email']).all()
+    user_list = db_session.query(User).\
+        filter(User.email == session['email']).all()
+    # create user if not present
     if len(user_list) == 0:
-        us = User(name = auth['name'], email = auth['email'], pic = auth['picture'])
+        us = User(name=auth['name'], email=auth['email'], pic=auth['picture'])
         db_session.add(us)
         db_session.commit()
-        user = db_session.query(User).filter(User.email == session['email']).one()
+        user = db_session.query(User).\
+            filter(User.email == session['email']).one()
         session['id'] = user.id
     else:
         session['id'] = user_list[0].id
-    res = make_response(json.dumps({'name':auth['name'],'pic':auth['picture'],'email':auth['email']}),200)
+    res = make_response(json.dumps({
+        'name': auth['name'], 'pic': auth['picture'],
+        'email': auth['email']}), 200)
     res.headers['Content-Type'] = 'application/json'
     return res
 
-@app.route('/api/v1/addCategory',methods=['POST'])
+
+# route for adding category
+@app.route('/api/v1/addCategory', methods=['POST'])
 def addCategory():
-    if session.get('id',0) != 0:
+    if session.get('id', 0) != 0:
         id = session['id']
         name = request.json['name']
         desc = request.json['description']
-        c = Category(name = name, description = desc, created_by =id)
+        c = Category(name=name, description=desc, created_by=id)
         db_session.add(c)
         db_session.commit()
-        res = make_response(json.dumps({'id':c.id,'msg':"category added"}), 200)
+        res = make_response(json.dumps({'id': c.id, 'msg': "category added"}),
+                            200)
         res.headers['Content-Type'] = 'application/json'
         return res
     else:
@@ -111,18 +128,19 @@ def addCategory():
         return res
 
 
-@app.route('/api/v1/addItem',methods=['POST'])
+# route for adding item
+@app.route('/api/v1/addItem', methods=['POST'])
 def apiAddCategory():
-    if session.get('id',0) != 0:
+    if session.get('id', 0) != 0:
         id = session['id']
         name = request.json['name']
         desc = request.json['description']
         cid = request.json['cid']
-        c = CategoryItem(name = name, description = desc, created_by =id,
-        belongs_to = cid )
+        c = CategoryItem(name=name, description=desc, created_by=id,
+                         belongs_to=cid)
         db_session.add(c)
         db_session.commit()
-        res = make_response(json.dumps({'id':c.id,'msg':"item added"}), 200)
+        res = make_response(json.dumps({'id': c.id, 'msg': "item added"}), 200)
         res.headers['Content-Type'] = 'application/json'
         return res
     else:
@@ -131,62 +149,77 @@ def apiAddCategory():
         return res
 
 
+# categories page
 @app.route('/categories/<int:id>')
 def catHtml(id):
     try:
-        if session.get('id',0) != 0:
+        if session.get('id', 0) != 0:
             login = session
         else:
-             login = False
+            login = False
         c = db_session.query(Category).filter(Category.id == id).one()
         categories = db_session.query(Category).all()
         return render_template('category.html',
-    state = session['state'],client = client_json['web']['client_id'],
-    appid = app_id,login = login,categories = categories,category = c,
-     title = c.name)
+                               state=session['state'],
+                               client=client_json['web']['client_id'],
+                               appid=app_id, login=login,
+                               categories=categories,
+                               category=c, title=c.name)
     except Exception as e:
         print(e)
         res = make_response('<h3>Invalid Category</h3>')
         return res
 
-@app.route('/users/<int:id>/', methods = ['GET'])
+
+# user profile page
+@app.route('/users/<int:id>/', methods=['GET'])
 def userProfile(id):
     try:
-        if session.get('id',0) != 0:
+        if session.get('id', 0) != 0:
             login = session
         else:
-             login = False
+            login = False
         u = db_session.query(User).filter(User.id == id).one()
         categories = db_session.query(Category).all()
         return render_template('profile.html',
-    state = session['state'],client = client_json['web']['client_id'],
-    appid = app_id,login = login,categories = categories,user = u,
-     title = u.name+"'s Profile")
+                               state=session['state'],
+                               client=client_json['web']['client_id'],
+                               appid=app_id,
+                               login=login,
+                               categories=categories,
+                               user=u,
+                               title=u.name+"'s Profile")
     except Exception as e:
         print(e)
         res = make_response("<h1>user not found </h1>", 404)
         return res
 
 
+# items page
 @app.route('/items/<int:id>')
 def itemHtml(id):
     try:
-        if session.get('id',0) != 0:
+        if session.get('id', 0) != 0:
             login = session
         else:
-             login = False
+            login = False
         c = db_session.query(CategoryItem).filter(CategoryItem.id == id).one()
         categories = db_session.query(Category).all()
         return render_template('item.html',
-    state = session['state'],client = client_json['web']['client_id'],
-    appid = app_id,login = login,categories = categories,item = c,
-     title = c.name)
+                               state=session['state'],
+                               client=client_json['web']['client_id'],
+                               appid=app_id,
+                               login=login,
+                               categories=categories,
+                               item=c, title=c.name)
     except Exception as e:
         print(e)
         res = make_response('<h3>Invalid Item</h3>')
         return res
 
-@app.route('/api/v1/gconnect',methods = ['POST'])
+
+# sign in using google account
+@app.route('/api/v1/gconnect', methods=['POST'])
 def google():
     # Validate state token
     if request.args.get('state') != session['state']:
@@ -198,12 +231,13 @@ def google():
 
     try:
         # Upgrade the authorization code into a credentials object
-        oauth_flow = flow_from_clientsecrets('client_secret.json', scope='profile')
+        oauth_flow = flow_from_clientsecrets('client_secret.json',
+                                             scope='profile')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
-        response = make_response(
-            json.dumps('Failed to upgrade the authorization code.'), 401)
+        response = make_response(json.dumps('Failed to upgrade the \
+                                            authorization code.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -237,9 +271,10 @@ def google():
     stored_access_token = session.get('access_token')
     stored_gplus_id = session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        res = make_response(json.dumps({'name':session['username'],
-        'email':session['email'],'pic': session['pic'],'alreadyLogged' : True})
-        ,200)
+        res = make_response(json.dumps({'name': session['username'],
+                                        'email': session['email'],
+                                        'pic': session['pic'],
+                                        'alreadyLogged': True}), 200)
         res.headers['Content-Type'] = 'application/json'
         return res
 
@@ -263,55 +298,63 @@ def google():
     session['email'] = data['email']
     session['provider'] = 'google'
 
-    user_list = db_session.query(User).filter(User.email == session['email'])\
-    .all()
+    user_l = db_session.query(User).filter(User.email == session['email'])
+    user_list = user_l.all()
+    # create user if not present
     if len(user_list) == 0:
-        us = User(name = name, email = data['email'], pic = data['picture'])
+        us = User(name=name, email=data['email'], pic=data['picture'])
         db_session.add(us)
         db_session.commit()
-        user = db_session.query(User).filter(User.email == session['email'])\
-        .one()
+        user_d = db_session.query(User).filter(User.email == session['email'])
+        user = user_d.one()
         session['id'] = user.id
     else:
         session['id'] = user_list[0].id
 
-    res = make_response(json.dumps({'name':session['username'],
-    'email':data['email'],'pic': data['picture'],'alreadyLogged':False}),200)
+    res = make_response(json.dumps({'name': session['username'],
+                                    'email': data['email'],
+                                    'pic': data['picture'],
+                                    'alreadyLogged': False}), 200)
     res.headers['Content-Type'] = 'application/json'
     return res
 
 
-@app.route('/api/v1/catalog/', methods = ['GET'])
+# json api for a summary of all categories
+@app.route('/api/v1/catalog/', methods=['GET'])
 def catalog():
     categories = db_session.query(Category).order_by(Category.id).all()
-    return jsonify(categories = [ cat.serialize for cat in categories])
+    return jsonify(categories=[cat.serialize for cat in categories])
 
 
-@app.route('/api/v1/categories/<int:id>/', methods = ['GET','DELETE','PUT'])
+# json api to get,delete and update individual category information
+@app.route('/api/v1/categories/<int:id>/', methods=['GET', 'DELETE', 'PUT'])
 def category(id):
     try:
         c = db_session.query(Category).filter(Category.id == id).one()
         if request.method == 'GET':
             return jsonify(c.serialize)
         elif request.method == 'DELETE':
-            if session.get('id',0) == 0:
+            # check if used has logged in
+            if session.get('id', 0) == 0:
                 res = make_response(json.dumps("forbidden"), 403)
                 res.headers['Content-Type'] = 'application/json'
                 return res
             else:
+                # check if the logged in user is the owner
                 if session['id'] != c.created_by:
                     res = make_response(json.dumps("forbidden"), 403)
                     res.headers['Content-Type'] = 'application/json'
                     return res
                 else:
+                    # cleared criteria perform operation
                     db_session.delete(c)
                     db_session.commit()
-                    res = make_response(json.dumps("deleted category successfully"),
-                    200)
+                    res = make_response(json.dumps("deleted category\
+                                                    successfully"), 200)
                     res.headers['Content-Type'] = 'application/json'
                     return res
         else:
-            if session.get('id',0) == 0:
+            if session.get('id', 0) == 0:
                 res = make_response(json.dumps("forbidden"), 403)
                 res.headers['Content-Type'] = 'application/json'
                 return res
@@ -322,17 +365,19 @@ def category(id):
                     return res
                 else:
                     if request.json is not None:
+                        # check if request is in JSON format
                         j = request.json
                         c.name = j['name']
                         c.description = j['description']
                         c.latest_update = datetime.utcnow()
                         db_session.commit()
-                        res = make_response(json.dumps("item updated successfully"), 200)
+                        res = make_response(json.dumps("item updated \
+                                                        successfully"), 200)
                         res.headers['Content-Type'] = 'application/json'
                         return res
                     else:
-                        res = make_response(json.dumps("request should be a valid JSON")
-                                            , 400)
+                        res = make_response(json.dumps("request should be \
+                                                        a valid JSON"), 400)
                         res.headers['Content-Type'] = 'application/json'
                         return res
     except Exception as e:
@@ -342,7 +387,8 @@ def category(id):
         return res
 
 
-@app.route('/api/v1/users/<int:id>/', methods = ['GET'])
+# get info about user in JSON format
+@app.route('/api/v1/users/<int:id>/', methods=['GET'])
 def user(id):
     try:
         u = db_session.query(User).filter(User.id == id).one()
@@ -354,15 +400,15 @@ def user(id):
         return res
 
 
-
-@app.route('/api/v1/items/<int:id>/', methods = ['GET','DELETE','PUT'])
+# get/update/delete info about items in JSON format
+@app.route('/api/v1/items/<int:id>/', methods=['GET', 'DELETE', 'PUT'])
 def item(id):
     try:
         i = db_session.query(CategoryItem).filter(CategoryItem.id == id).one()
         if request.method == 'GET':
             return jsonify(i.serialize)
         elif request.method == 'DELETE':
-            if session.get('id',0) == 0:
+            if session.get('id', 0) == 0:
                 res = make_response(json.dumps("forbidden"), 403)
                 res.headers['Content-Type'] = 'application/json'
                 return res
@@ -374,11 +420,12 @@ def item(id):
                 else:
                     db_session.delete(i)
                     db_session.commit()
-                    res = make_response(json.dumps("deleted item successfully"), 200)
+                    res = make_response(json.dumps("deleted item successfully"
+                                                   ), 200)
                     res.headers['Content-Type'] = 'application/json'
                     return res
         else:
-            if session.get('id',0) == 0:
+            if session.get('id', 0) == 0:
                 res = make_response(json.dumps("forbidden"), 403)
                 res.headers['Content-Type'] = 'application/json'
                 return res
@@ -394,12 +441,13 @@ def item(id):
                         i.description = j['description']
                         i.latest_update = datetime.utcnow()
                         db_session.commit()
-                        res = make_response(json.dumps("item updated successfully"), 200)
+                        res = make_response(json.dumps("item updated \
+                                                        successfully"), 200)
                         res.headers['Content-Type'] = 'application/json'
                         return res
                     else:
-                        res = make_response(json.dumps("request should be a valid JSON")
-                                            , 400)
+                        res = make_response(json.dumps("request should be a \
+                                                        valid JSON"), 400)
                         res.headers['Content-Type'] = 'application/json'
                         return res
 
@@ -409,9 +457,11 @@ def item(id):
         res.headers['Content-Type'] = 'application/json'
         return res
 
+
+# logout from the application
 @app.route('/logout')
 def logout():
-    if session.get('id',0) != 0 :
+    if session.get('id', 0) != 0:
         del session['id']
         if session['provider'] == "google":
             gdisconnect()
@@ -421,4 +471,4 @@ def logout():
 
 if __name__ == "__main__":
     app.secret_key = ' 73RKJLNKGRXGX2CLH7KONEASLITQGLBK '
-    app.run(host = '0.0.0.0', port = 5000, debug = True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

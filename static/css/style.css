@@ -21,7 +21,7 @@ body {
   right: 0;
   left: 0;
 }
-button{
+button {
   background-color: #FAFAFA;
   padding: 5px;
   margin: 0px;
@@ -34,7 +34,7 @@ pre {
   font-family: sans-serif;
   white-space: pre-line;
 }
-#category-name, #item-name{
+#category-name, #item-name {
   padding: 5px;
   outline: none;
   border-radius: 2px;
@@ -43,7 +43,7 @@ pre {
   border-bottom: 1px solid #111;
   margin-right: 20px;
 }
-#category-description, #item-description{
+#category-description, #item-description {
   padding: 10px;
   font-size: 16px;
   outline: none;
@@ -54,14 +54,14 @@ pre {
   margin-left: auto;
   margin-right: auto;
 }
-#category-container{
+#category-container {
   max-width: 80%;
   margin-left: auto;
   margin-right: auto;
   margin-top: 50px;
   position: relative;
 }
-.edit-controls{
+.edit-controls {
   position: absolute;
   right: 0;
   top:0px;
@@ -76,7 +76,7 @@ pre {
   margin-right: auto;
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.15);
 }
-#user-header img{
+#user-header img {
   border-radius: 50%;
   width: 150px;
   height: 150px;
@@ -122,7 +122,7 @@ pre {
 .dialog textarea {
   max-width: 80%;
 }
-#data-table tr{
+#data-table tr {
   border: 1px solid #CCC;
 }
 #data-table td, #data-table th {
@@ -140,7 +140,7 @@ pre {
   margin-top: 10px;
 }
 
-#category-button * , #show-add *{
+#category-button * , #show-add * {
   vertical-align: middle;
 }
 #category-button img, #show-add img {
@@ -204,7 +204,7 @@ pre {
 #nav-list li:hover {
   background-color: #004D40;
 }
-#nav-list a{
+#nav-list a {
   text-decoration: none;
   color: #FFF;
   display: block;
@@ -260,7 +260,7 @@ pre {
   background-color: #FFF;
   max-width: 80%;
 }
-.login-dialog .close, #add-close ,#add-cclose{
+.login-dialog .close, #add-close ,#add-cclose {
   position: fixed;
   top:-30px;
   right: -30px;
@@ -268,7 +268,7 @@ pre {
   height: 25px;
   cursor: pointer;
 }
-.login-dialog td,th{
+.login-dialog td,th {
   text-align: center;
   padding: 5px;
 }
@@ -286,13 +286,13 @@ pre {
   line-height: 50px;
   color: #FFF;
 }
-#options img{
+#options img {
   width: 40px;
   height: auto;
   display: inline-block;
   vertical-align: middle;
 }
-#options span{
+#options span {
   display: inline-block;
 }
 #md-textarea {
@@ -309,7 +309,7 @@ pre {
   text-decoration: none;
   color: #FFF;
 }
-#nav-box{
+#nav-box {
   display: none;
 }
 #nav-box:checked + nav {
@@ -329,7 +329,7 @@ pre {
   transform: translate(-50%,-50%);
   max-width: 80%;
 }
-#add-dialog textarea{
+#add-dialog textarea {
   max-width: 95%;
 }
 
@@ -350,13 +350,13 @@ nav {
   nav{
     transform: translateX(0px);
   }
-  #main-content{
+  #main-content {
     margin-left: 220px;
   }
   #app-title {
     margin-left: 15px !important;
   }
-  #user-profile{
+  #user-profile {
     max-width: 80%;
     margin-left: auto;
     margin-right: auto;
