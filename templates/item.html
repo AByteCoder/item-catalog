@@ -1,0 +1,40 @@
+{% extends "skeleton.html" %}
+{% block body %}
+<article id="category-container" data-id="{{ item.id }}">
+  <h3 id="item-n"> {{ item.name }} </h3>
+  <hr/>
+  <div id="item-d">
+    {% filter markdown %}
+    {{ item.description }}
+    {% endfilter %}
+  </div>
+  {% if login  and login['id'] == item.created_by %}
+  <div class="edit-controls">
+    <button id="update-button" title="edit"> <img src="{{ url_for('static',filename='assets/edit.png')}}" /></button>
+    <button id="delete-button" data-id="{{item.category.id}}" title="delete"><img src="{{ url_for('static',filename='assets/delete.png')}}" /></button>
+  </div>
+  <div class="dialog" id="add-c-dialog">
+    <div id="add-dialog">
+      <img id="add-close" src="{{ url_for('static', filename='assets/close.png')}}" />
+      <form onsubmit="return updateItem()" id="item-form">
+        <input type="text" placeholder="Item Name" required
+        id="item-name" value="{{ item.name }}"/>
+        <textarea id="item-description" rows="3" cols="50"
+        placeholder="Enter the item description"
+        required>{{ item.description }}</textarea>
+        <input type="hidden" id="item-id" value="{{ item.id }}"/>
+        <button  type="button" id="preview-button" data-for="item"
+        data-title="item-name" data-desc="item-description"
+        data-container="add-dialog">
+          Preview Content
+        </button>
+        <button type="submit" id="category-button">
+            <img src="{{ url_for('static', filename='assets/add.png') }}" />
+            Update item
+        </button>
+      </form>
+    </div>
+</div>
+  {% endif %}
+</article>
+{% endblock %}

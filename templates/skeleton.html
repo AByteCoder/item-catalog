@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title> {{ title }} </title>
+  <link href=" {{ url_for('static', filename='css/style.css')}}"
+  rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src={{ url_for('static', filename='js/jquery.js') }}>
+  </script>
+<script src="//apis.google.com/js/platform.js?onload=start" async> </script>
+</head>
+<body>
+  <header id="header-bar">
+    <label for="nav-box" id="menu-label">
+      <img id="menu-button" src="{{ url_for('static', filename='assets/menu.png') }}" />
+    </label>
+    <a href="/" id="app-title">Item Catalog</a>
+    <div id="login-container">
+      {% if not login %}
+      <img id="user-pic" src="{{ url_for('static', filename='assets/login.png')}}" />
+      <span id="user-name">Login</span>
+      {% else %}
+      <img id="user-pic" src="{{ login['pic'] }}" />
+      <span id="user-name">{{ login['username'] }}</span>
+      <ul id="options">
+        <li>
+          <a href="/users/{{ login['id'] }}/">
+            <img src="{{ url_for('static',filename='assets/login.png') }}" />
+            <span>My Profile </span>
+          </a>
+        </li>
+        <li>
+          <a href="/logout" id="logout-button">
+            <img src="{{ url_for('static',filename='assets/logout.png') }}" />
+            <span> Logout </span>
+          </a>
+        </li>
+      </ul>
+      {% endif %}
+    </div>
+    <input type="checkbox" id="nav-box" />
+    <nav>
+      <ul id="nav-list">
+        {% for category in categories %}
+        <li><a href="/categories/{{ category.id }}">{{ category.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </nav>
+  </header>
+  <div class="dialog">
+    <div class="login-dialog">
+      <img class="close" src="{{ url_for('static', filename='assets/close.png')}}" />
+      <table>
+        <tr>
+          <th>Login using Google</th>
+          <th>Login using Facebook</th>
+        </tr>
+        <tr>
+          <td>
+            <div id="signinButton">
+                    <span class="g-signin"
+                      data-scope="openid email"
+                      data-clientid="{{ client }}"
+                      data-redirecturi="postmessage"
+                      data-accesstype="offline"
+                      data-cookiepolicy="single_host_origin"
+                      data-callback="signInCallback"
+                      data-approvalprompt="force">
+                    </span>
+                </div>
+          </td>
+          <td>
+            <fb:login-button
+              scope="public_profile,email"
+              onlogin="checkLoginState();"
+              data-size="large">
+            </fb:login-button>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <section id="main-content">
+    {% block body %} {% endblock %}
+  </section>
+<script>
+var provider;
+{% if login %}
+var login = true;
+{% else %}
+var login = false;
+{% endif %}
+function checkLoginState() {
+  FB.getLoginStatus(function(response) {
+    statusChangeCallback(response);
+  });
+}
+function statusChangeCallback(response){
+  if(response.status == 'connected'){
+    FB.api('/me',{fields: 'name, email'}, function(response) {
+      response.picture = "http://graph.facebook.com/" + response.id + "/picture?type=normal"
+      $.ajax({
+        type:'POST',
+        url : 'api/v1/fconnect?state={{ state }}',
+        data : JSON.stringify(response),
+        dataType:'json',
+        contentType:'application/json',
+        success:function(result){
+          $('#user-name').text(result.name)
+          $('#user-pic').attr('src',result.pic)
+          $('.dialog').hide()
+          login = true
+          location.reload()
+          provider = 1;
+        },
+        error: function(xhr,err){
+          console.log(xhr.responseText)
+        }
+
+      })
+});
+
+  }
+}
+function signInCallback(authResult){
+  if(authResult['code']){
+      $.ajax({
+        type : 'POST',
+        url : '/api/v1/gconnect?state={{ state }}',
+        data : authResult['code'],
+        dataType:'json',
+        processData : false,
+        contentType: 'application/octet-stream; charset=utf-8',
+        success : function(result){
+          $('#user-name').text(result.name)
+          $('#user-pic').attr('src',result.pic)
+          $('.dialog').hide()
+          login = true
+          location.reload()
+          provider = 0;
+        },
+        error: function(xhr,err){
+          console.log(xhr.responseText)
+        }
+      })
+  }
+}
+</script>
+
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '{{ appid }}',
+      cookie     : true,
+      xfbml      : true,
+      version    : 'v2.8'
+    });
+
+    FB.AppEvents.logPageView();
+
+  };
+  $('#login-container').click(function(){
+    if( !login )
+    $('.dialog').show()
+  })
+  $('.login-dialog .close').click(function(){
+    $('.dialog').hide()
+  })
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "https://connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
+<script src={{ url_for('static', filename='js/showdown.js') }}></script>
+<script src={{ url_for('static', filename='js/script.js') }} >
+</script>
+</body>
+</html>

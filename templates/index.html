@@ -1,0 +1,54 @@
+{% extends "skeleton.html" %}
+{% block body %}
+{% if login %}
+<div class="dialog" id="add-c-dialog">
+  <div id="add-dialog">
+    <img id="add-close" src="{{ url_for('static', filename='assets/close.png')}}" />
+    <form onsubmit="return createCategory()" id="category-form">
+      <input type="text" placeholder="Category Name" required id="category-name"/>
+      <textarea id="category-description" rows="3" cols="50"
+      placeholder="Enter the catergory description" required></textarea>
+      <button  type="button" id="preview-button" data-for="item"
+      data-title="category-name" data-desc="category-description"
+      data-container="add-dialog">
+        Preview Content
+      </button>
+      <button type="submit" id="category-button">
+        <img src="{{ url_for('static', filename='assets/add.png') }}" />
+        Create Category
+      </button>
+    </form>
+  </div>
+</div>
+
+
+{% endif %}
+{% if items|length == 0 %}
+<h3> No items found </h3>
+{% else %}
+<div style="max-width:100%;overflow-x:auto;">
+  <table id="data-table">
+    <tr>
+      <th> Item Name </th>
+      <th> Category </th>
+      <th> Last Updated On </th>
+      <th> Created By </th>
+    </tr>
+  {% for item in items %}
+  <tr>
+    <td><a href="/items/{{ item.id }}" >{{ item.name }} </a></td>
+    <td><a href="/categories/{{ item.category.id }}">{{ item.category.name }}</a></td>
+    <td class="convert-to">{{ item.latest_update }}</td>
+    <td><a href="/users/{{ item.created_user.id }}/">{{ item.created_user.name }} </a></td>
+  </tr>
+  {% endfor %}
+  </table>
+</div>
+{% endif %}
+{% if login %}
+<button id="show-add" data-show="add-c-dialog">
+  <img src="{{ url_for('static', filename='assets/add.png') }}" />
+  Add Category
+</button>
+{% endif %}
+{% endblock %}

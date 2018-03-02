@@ -1,0 +1,364 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background-color: #E0F2F1;
+}
+#main-content article {
+  padding: 10px;
+  border-radius: 3px;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.15),0 -1px 1px rgba(0,0,0,0.15),
+  -1px 0px 1px rgba(0,0,0,0.15),1px 0px 1px rgba(0,0,0,0.15);
+  background-color: #FAFAFA;
+}
+#header-bar {
+  height: 48px;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.15);
+  color: #FFF;
+  background-color:#004D40;
+  position: fixed;
+  top:0;
+  z-index: 2;
+  right: 0;
+  left: 0;
+}
+button{
+  background-color: #FAFAFA;
+  padding: 5px;
+  margin: 0px;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.15);
+  border-radius: 2px;
+  border: none;
+  cursor: pointer;
+}
+pre {
+  font-family: sans-serif;
+  white-space: pre-line;
+}
+#category-name, #item-name{
+  padding: 5px;
+  outline: none;
+  border-radius: 2px;
+  border: none;
+  font-size: 16px;
+  border-bottom: 1px solid #111;
+  margin-right: 20px;
+}
+#category-description, #item-description{
+  padding: 10px;
+  font-size: 16px;
+  outline: none;
+  display: block;
+  font-family: sans-serif;
+  margin-top: 20px;
+  border-radius: 2px;
+  margin-left: auto;
+  margin-right: auto;
+}
+#category-container{
+  max-width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 50px;
+  position: relative;
+}
+.edit-controls{
+  position: absolute;
+  right: 0;
+  top:0px;
+}
+#user-header {
+  background-color: #00796B;
+  width: 100%;
+  max-width: 600px;
+  height: 250px;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.15);
+}
+#user-header img{
+  border-radius: 50%;
+  width: 150px;
+  height: 150px;
+}
+#user-header div {
+  position: absolute;
+  top :50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  text-align: center;
+}
+#profile-name, #profile-email {
+  display: block;
+  color: #FFF;
+}
+#profile-name {
+  font-size: 16px;
+  font-weight: bold;
+}
+#profile-email {
+  font-size: 12px;
+}
+#update-button img, #delete-button img,#update-c-button img, #delete-c-button img {
+  width: 24px;
+  height: 24px;
+}
+#show-add {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+#data-table {
+  padding: 10px;
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid #CCC;
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 600px;
+  background: #FAFAFA;
+}
+.dialog textarea {
+  max-width: 80%;
+}
+#data-table tr{
+  border: 1px solid #CCC;
+}
+#data-table td, #data-table th {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #CCC;
+}
+#category-button, #show-add ,#preview-button,#preview-cbutton {
+  background-color: #004D40;
+  color: #FFF;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 30px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+#category-button * , #show-add *{
+  vertical-align: middle;
+}
+#category-button img, #show-add img {
+  width: 25px;
+  height: 25px;
+}
+#back {
+  cursor: pointer;
+  height: 48px;
+  line-height: 48px;
+}
+#back * {
+  vertical-align: middle;
+}
+#preview-title {
+  margin-top: 10px;
+  padding: 5px;
+  padding-bottom: 0px;
+}
+#back img {
+  width: 24px;
+  height: 24px;
+  margin-right: 5px;
+}
+#add-dialog {
+  background-color: #FFF;
+  padding: 20px;
+  border-radius: 3px;
+  position: fixed;
+  top:50%;
+  left:50%;
+  transform: translate(-50%,-50%);
+  min-width: 300px;
+}
+#login-container {
+  position: absolute;
+  right: 0px;
+  top:50%;
+  transform: translateY(-50%);
+  height: 48px;
+  line-height: 48px;
+  cursor: pointer;
+}
+#login-container img {
+  width: 50px;
+  height: auto;
+  border-radius: 50%;
+  max-height: 70px;
+  display: inline-block;
+  vertical-align: middle;
+}
+#nav-list {
+  list-style-type: none;
+  margin: 0px;
+  padding: 0px;
+}
+#nav-list li {
+  padding: 10px;
+  margin: 0px;
+}
+#nav-list li:hover {
+  background-color: #004D40;
+}
+#nav-list a{
+  text-decoration: none;
+  color: #FFF;
+  display: block;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+}
+#login-container span {
+  display: inline-block;
+  font-weight: 400;
+}
+#login-container:hover #options {
+  display: block;
+}
+#menu-button {
+  display: inline;
+  margin-left:10px;
+  width: 24px;
+  height: 24px;
+  margin-top: 12px;
+  cursor: pointer;
+}
+#options {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0px;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.15),1px 0px 2px 0 rgba(0,0,0,0.15);
+  background-color: #009688;
+  color:#FFF;
+  margin: 0;
+  padding: 0px;
+  list-style-type: none;
+  z-index: 2;
+}
+.dialog {
+  z-index: 2;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0,0,0,0.6);
+  display: none;
+}
+.login-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 10px;
+  border-radius: 3px;
+  background-color: #FFF;
+  max-width: 80%;
+}
+.login-dialog .close, #add-close ,#add-cclose{
+  position: fixed;
+  top:-30px;
+  right: -30px;
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+}
+.login-dialog td,th{
+  text-align: center;
+  padding: 5px;
+}
+#options li:hover {
+  background-color: #004D40;
+}
+#options li {
+  padding: 5px;
+  text-align: center;
+  background-color: #009688;
+}
+#options li a {
+  text-decoration: none;
+  display: block;
+  line-height: 50px;
+  color: #FFF;
+}
+#options img{
+  width: 40px;
+  height: auto;
+  display: inline-block;
+  vertical-align: middle;
+}
+#options span{
+  display: inline-block;
+}
+#md-textarea {
+  display: none;
+}
+#header-bar #app-title {
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 48px;
+  margin: 0px;
+  display: inline-block;
+  height: 48px;
+  vertical-align: top;
+  text-decoration: none;
+  color: #FFF;
+}
+#nav-box{
+  display: none;
+}
+#nav-box:checked + nav {
+  transform: translateX(0px);
+}
+#main-content {
+  position: relative;
+  top:60px;
+}
+#add-dialog ,#update-cdialog {
+  border-radius: 3px;
+  padding: 10px;
+  background-color: #FFF;
+  position: fixed;
+  top:50%;
+  left:50%;
+  transform: translate(-50%,-50%);
+  max-width: 80%;
+}
+#add-dialog textarea{
+  max-width: 95%;
+}
+
+nav {
+  position: fixed;
+  top: 48px;
+  bottom: 0;
+  left: 0;
+  width: 220px;
+  transform: translateX(-220px);
+  transition: 0.2s transform ease-in;
+  background-color: #00695C;
+}
+@media screen and (min-width:1280px){
+  #menu-label {
+    display: none;
+  }
+  nav{
+    transform: translateX(0px);
+  }
+  #main-content{
+    margin-left: 220px;
+  }
+  #app-title {
+    margin-left: 15px !important;
+  }
+  #user-profile{
+    max-width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}

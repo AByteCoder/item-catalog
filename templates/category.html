@@ -1,0 +1,92 @@
+{% extends "skeleton.html" %}
+{% block body %}
+<article id="category-container" data-id="{{ category.id }}">
+  <h3 id="c-name"> {{ category.name }} </h3>
+  <hr/>
+  <div id="c-desc">
+    {% filter markdown %}
+    {{ category.description}}
+    {% endfilter %}
+  </div>
+  <hr/>
+  {% if login  and login['id'] == category.created_by %}
+  <div class="edit-controls">
+    <button id="update-c-button" title="edit" data-container="update-cdialog"> <img src="{{ url_for('static',filename='assets/edit.png')}}" /></button>
+    <button id="delete-c-button" data-id="{{category.id}}" title="delete"><img src="{{ url_for('static',filename='assets/delete.png')}}" /></button>
+  </div>
+  <div class="dialog" id="update-c-dialog">
+    <div id="update-cdialog">
+      <img id="add-cclose" src="{{ url_for('static', filename='assets/close.png')}}" />
+      <form onsubmit="return updateCategory()" id="category-form">
+        <input type="text" placeholder="Category Name" required
+        id="category-name" value="{{ category.name }}"/>
+        <textarea id="category-description" rows="3" cols="50"
+        placeholder="Enter the Category description"
+        required>{{ category.description }}</textarea>
+        <input type="hidden" id="category-id" value="{{ category.id }}"/>
+        <button  type="button" id="preview-cbutton" data-for="category"
+        data-title="category-name" data-desc="category-description"
+        data-container="update-cdialog">
+          Preview Content
+        </button>
+        <button type="submit" id="category-button">
+            <img src="{{ url_for('static', filename='assets/add.png') }}" />
+            Update item
+        </button>
+      </form>
+    </div>
+</div>
+  {% endif %}
+  {% if login %}
+    <div class="dialog" id="add-c-dialog">
+      <div id="add-dialog">
+        <img id="add-close" src="{{ url_for('static', filename='assets/close.png')}}" />
+        <form onsubmit="return createItem()" id="item-form">
+          <input type="text" placeholder="Item Name" required id="item-name"/>
+          <textarea id="item-description" rows="3" cols="50"
+          placeholder="Enter the item description" required></textarea>
+          <button  type="button" id="preview-button" data-for="item"
+          data-title="item-name" data-desc="item-description"
+          data-container="add-dialog">
+            Preview Content
+          </button>
+          <button type="submit" id="category-button">
+              <img src="{{ url_for('static', filename='assets/add.png') }}" />
+              Add Item
+          </button>
+        </form>
+      </div>
+  </div>
+  <div id="item-container" data-count="{{ category.items|length }}"
+  data-name="{{ login['username'] }}" data-id="{{ login['id'] }}">
+  {% endif %}
+  {% if category.items|length != 0 %}
+  <h4>Items in {{ category.name }}</h4>
+  <div style="max-width:100%;overflow-x:auto;">
+    <table id="data-table">
+      <tr>
+        <th> Item Name </th>
+        <th> Last Updated On </th>
+        <th> Created By </th>
+      </tr>
+    {% for item in category.items %}
+    <tr>
+      <td><a href="/items/{{ item.id }}" >{{ item.name }} </a></td>
+      <td class="convert-to">{{ item.latest_update}}</td>
+      <td><a href="/users/{{ item.created_user.id }}/">{{ item.created_user.name }} </a> </td>
+    </tr>
+    {% endfor %}
+    </table>
+  </div>
+  {% else %}
+    <h4> No item present</h4>
+  {% endif %}
+</div>
+  {% if login %}
+  <button id="show-add" data-show="add-c-dialog">
+      <img src="{{ url_for('static', filename='assets/add.png') }}" />
+      Add Item
+  </button>
+  {% endif %}
+</article>
+{% endblock %}
